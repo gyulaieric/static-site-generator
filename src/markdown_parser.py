@@ -4,7 +4,7 @@ from textnode import TextNode, TextType
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
     new_nodes = []
     for old_node in old_nodes:
-        if old_node.text_type != TextType.TEXT:
+        if old_node.text_type != TextType.TEXT or delimiter not in old_node.text:
             new_nodes.append(old_node)
         else:
             node = old_node.text.split(delimiter)
@@ -60,3 +60,18 @@ def split_nodes_link(old_nodes):
             if remaining != "":
                     new_nodes.append(TextNode(remaining, TextType.TEXT))
     return new_nodes
+
+def text_to_textnodes(text):
+    result = [TextNode(text, TextType.TEXT)]
+    delimiters = {
+        "**": TextType.BOLD,
+        "_": TextType.ITALIC,
+        "`": TextType.CODE
+        }
+    for delimiter, text_type in delimiters.items():
+        result = split_nodes_delimiter(result, delimiter, text_type)
+    
+    result = split_nodes_image(result)
+    result = split_nodes_link(result)
+
+    return result

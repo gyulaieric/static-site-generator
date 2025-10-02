@@ -1,8 +1,8 @@
 from textnode import TextType, TextNode
-from markdown_parser import split_nodes_image, split_nodes_link
+from markdown_parser import *
 
 def main():
-    text = TextNode("This is text with a", TextType.TEXT)
-    print(split_nodes_link([text]))
+    text = "This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
+    print(text_to_textnodes(text))
 
 main()
