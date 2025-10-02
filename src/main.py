@@ -1,19 +1,10 @@
-from textnode import TextType, TextNode
+from textnode import TextType, TextNode, text_node_to_html_node
 from htmlnode import HTMLNode
 from leafnode import LeafNode
 from parentnode import ParentNode
 
 def main():
-    node = ParentNode(
-        "p",
-        [
-            LeafNode("b", "Bold text"),
-            LeafNode(None, "Normal text"),
-            LeafNode("i", "italic text"),
-            LeafNode(None, "Normal text"),
-        ],
-    )
-    test_node = ParentNode("p", [])
+    text_node = TextNode("test", TextType.BOLD)
+    print(text_node_to_html_node(text_node))
 
-    print(test_node.to_html())
 main()
