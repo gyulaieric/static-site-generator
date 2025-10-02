@@ -1,7 +1,7 @@
 import unittest
 
 from textnode import TextNode, TextType
-from markdown_parser import split_nodes_delimiter
+from markdown_parser import split_nodes_delimiter, extract_markdown_images, extract_markdown_links
 
 class TestMarkdownParser(unittest.TestCase):
     def test_split_nodes_delimiter_bold(self):
@@ -43,5 +43,30 @@ class TestMarkdownParser(unittest.TestCase):
         with self.assertRaises(Exception) as e:
             split_nodes_delimiter([node], "`", TextType.TEXT)
         self.assertEqual(str(e.exception), "Invalid Markdown syntax")
+
+    def test_extract_markdown_images(self):
+        matches = extract_markdown_images(
+            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png)"
+        )
+        self.assertListEqual([("image", "https://i.imgur.com/zjjcJKZ.png")], matches)
+
+    def test_extract_markdown_images_no_image_in_markdown(self):
+        matches = extract_markdown_images(
+            "This is text with an [image](https://i.imgur.com/zjjcJKZ.png)"
+        )
+        self.assertListEqual([], matches)
+
+
+    def test_extract_markdown_links(self):
+        matches = extract_markdown_links(
+            "This is text with a [link](https://i.imgur.com/zjjcJKZ.png)"
+        )
+        self.assertListEqual([("link", "https://i.imgur.com/zjjcJKZ.png")], matches)
+    def test_extract_markdown_links_no_link_in_markdown(self):
+        matches = extract_markdown_links(
+            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png)"
+        )
+        self.assertListEqual([], matches)
+
 if __name__ == "__main__":
     unittest.main()
