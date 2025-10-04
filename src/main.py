@@ -1,15 +1,24 @@
-from textnode import TextType, TextNode
-from markdown_to_html import *
+import shutil
+import os
 
 def main():
-    md = """
-```
-This is text that _should_ remain
-the **same** even with inline stuff
-```
-    """
+    if os.path.exists("public"):
+        shutil.rmtree("public")
 
+    copy_contents("static", "public")
 
-    print(markdown_to_html_node(md).to_html())
+def copy_contents(src, dest):
+    if os.path.exists(src):
+        items = os.listdir(src)
+        if not os.path.exists(dest):
+            os.mkdir(dest)
+        for item in items:
+            if os.path.isdir(f"{src}/{item}"):
+                os.mkdir(f"{dest}/{item}")
+                copy_contents(f"{src}/{item}", f"{dest}/{item}")
+            else:
+                print(f"Copying {src}/{item} to {dest}")
+                shutil.copy(f"{src}/{item}", dest)
 
-main()
+if __name__ == "__main__":
+    main()
