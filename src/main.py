@@ -1,9 +1,15 @@
 from textnode import TextType, TextNode
-from markdown_parser import *
+from markdown_to_html import *
 
 def main():
-    markdown = "1. This is a quote\n2. This is another quote"
+    md = """
+```
+This is text that _should_ remain
+the **same** even with inline stuff
+```
+    """
 
-    print(block_to_block_type(markdown))
+
+    print(markdown_to_html_node(md).to_html())
 
 main()
