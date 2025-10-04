@@ -1,11 +1,15 @@
 import shutil
 import os
 
+from markdown_to_html import markdown_to_html_node
+
 def main():
     if os.path.exists("public"):
         shutil.rmtree("public")
 
     copy_contents("static", "public")
+
+    generate_pages_recursive("content", "template.html", "public")
 
 def copy_contents(src, dest):
     if os.path.exists(src):
@@ -19,6 +23,43 @@ def copy_contents(src, dest):
             else:
                 print(f"Copying {src}/{item} to {dest}")
                 shutil.copy(f"{src}/{item}", dest)
+
+def extract_title(markdown):
+    for line in markdown.split("\n"):
+        if line[:2] == '# ':
+            return line[1:].strip()
+    raise Exception("No h1 header in markdown")
+
+def generate_page(src, template_path, dest):
+    print(f"Generating page from {src} to {dest} using {template_path}")
+
+    source_file = open(src, "r")
+    markdown = source_file.read()
+    source_file.close()
+
+    template_file = open(template_path, "r")
+    template = template_file.read()
+    template_file.close()
+
+    html = markdown_to_html_node(markdown).to_html()
+    title = extract_title(markdown)
+
+    template = template.replace("{{ Title }}", title)
+    template = template.replace("{{ Content }}", html)
+
+    destination = open(dest, "w")
+    destination.write(template)
+    destination.close()
+
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    for entry in os.listdir(dir_path_content):
+        if os.path.isdir(os.path.join(dir_path_content, entry)):
+            dest = os.path.join(dest_dir_path, entry)
+            os.mkdir(dest)
+            generate_pages_recursive(os.path.join(dir_path_content, entry), template_path, dest)
+        else:
+            generate_page(os.path.join(dir_path_content, entry), template_path, os.path.join(dest_dir_path, "index.html"))
+
 
 if __name__ == "__main__":
     main()

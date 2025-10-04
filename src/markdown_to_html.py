@@ -17,7 +17,7 @@ def markdown_to_html_node(markdown):
             case BlockType.CODE:
                 blocks.append(HTMLNode("pre", None, [text_node_to_html_node(TextNode(block.strip("```").lstrip("\n"), TextType.CODE))]))
             case BlockType.QUOTE:
-                blocks.append(HTMLNode("blockquote", None, text_to_children(block.replace("> ", ""))))
+                blocks.append(HTMLNode("blockquote", None, text_to_children(block.replace(">", "").strip())))
             case BlockType.UNORDERED_LIST:
                 children = []
                 for line in block.split("\n"):
