@@ -278,5 +278,49 @@ This is the same paragraph on a new line
             ],
         )
 
+    def test_block_to_block_type_heading(self):
+        self.assertEqual(block_to_block_type("# Heading"), BlockType.HEADING)
+        self.assertEqual(block_to_block_type("### Subheading"), BlockType.HEADING)
+        self.assertEqual(block_to_block_type("###### Small heading"), BlockType.HEADING)
+
+    def test_block_to_block_type_code_block(self):
+        code = """```python
+print("Hello, world!")
+```"""
+        self.assertEqual(block_to_block_type(code), BlockType.CODE)
+
+    def test_block_to_block_type_quote_single_line(self):
+        self.assertEqual(block_to_block_type("> This is a quote"), BlockType.QUOTE)
+
+    def test_block_to_block_type_quote_multi_line_all_prefixed(self):
+        block = "> Line one\n> Line two\n> Line three"
+        self.assertEqual(block_to_block_type(block), BlockType.QUOTE)
+
+    def test_block_to_block_type_quote_invalid_line(self):
+        block = "> Line one\nNot a quote line"
+        self.assertEqual(block_to_block_type(block), BlockType.PARAGRAPH)
+
+    def test_block_to_block_type_unordered_list_single(self):
+        self.assertEqual(block_to_block_type("- item 1"), BlockType.UNORDERED_LIST)
+
+    def test_block_to_block_type_unordered_list_multiple(self):
+        block = "- item 1\n- item 2\n- item 3"
+        self.assertEqual(block_to_block_type(block), BlockType.UNORDERED_LIST)
+
+    def test_block_to_block_type_unordered_list_invalid(self):
+        block = "- item 1\nnot a list item"
+        self.assertEqual(block_to_block_type(block), BlockType.PARAGRAPH)
+
+    def test_block_to_block_type_ordered_list_valid(self):
+        block = "1. one\n2. two\n3. three"
+        self.assertEqual(block_to_block_type(block), BlockType.ORDERED_LIST)
+
+    def test_block_to_block_type_ordered_list_invalid(self):
+        block = "1. one\n3. two"
+        self.assertEqual(block_to_block_type(block), BlockType.PARAGRAPH)
+
+    def test_block_to_block_type_paragraph(self):
+        self.assertEqual(block_to_block_type("Just a normal text paragraph."), BlockType.PARAGRAPH)
+
 if __name__ == "__main__":
     unittest.main()
