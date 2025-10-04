@@ -1,15 +1,18 @@
 import shutil
 import os
+import sys
 
 from markdown_to_html import markdown_to_html_node
 
 def main():
-    if os.path.exists("public"):
-        shutil.rmtree("public")
+    basepath = sys.argv[1] if len(sys.argv) > 1 else "/"
 
-    copy_contents("static", "public")
+    if os.path.exists("docs"):
+        shutil.rmtree("docs")
 
-    generate_pages_recursive("content", "template.html", "public")
+    copy_contents("static", "docs")
+
+    generate_pages_recursive("content", "template.html", "docs", basepath)
 
 def copy_contents(src, dest):
     if os.path.exists(src):
@@ -30,7 +33,7 @@ def extract_title(markdown):
             return line[1:].strip()
     raise Exception("No h1 header in markdown")
 
-def generate_page(src, template_path, dest):
+def generate_page(src, template_path, dest, basepath):
     print(f"Generating page from {src} to {dest} using {template_path}")
 
     source_file = open(src, "r")
@@ -46,19 +49,21 @@ def generate_page(src, template_path, dest):
 
     template = template.replace("{{ Title }}", title)
     template = template.replace("{{ Content }}", html)
+    template = template.replace('href="/', f'href="/{basepath}')
+    template = template.replace('src="/', f'src="/{basepath}')
 
     destination = open(dest, "w")
     destination.write(template)
     destination.close()
 
-def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path, basepath):
     for entry in os.listdir(dir_path_content):
         if os.path.isdir(os.path.join(dir_path_content, entry)):
             dest = os.path.join(dest_dir_path, entry)
             os.mkdir(dest)
-            generate_pages_recursive(os.path.join(dir_path_content, entry), template_path, dest)
+            generate_pages_recursive(os.path.join(dir_path_content, entry), template_path, dest, basepath)
         else:
-            generate_page(os.path.join(dir_path_content, entry), template_path, os.path.join(dest_dir_path, "index.html"))
+            generate_page(os.path.join(dir_path_content, entry), template_path, os.path.join(dest_dir_path, "index.html"), basepath)
 
 
 if __name__ == "__main__":
